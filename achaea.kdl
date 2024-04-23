@@ -1,0 +1,35 @@
+layout {
+   pane split_direction="vertical" {
+      
+      pane split_direction="horizontal" {
+         size "20%" 
+         
+         pane {
+            command "nc"
+            args "-l" "-p 1300"
+         }
+
+         pane {
+            command "nc"
+            args "-l" "-p 1301"
+         }
+      }
+
+      pane split_direction="horizontal" {
+         size "80%"
+         pane {
+            size "30%"
+
+            name "Comms"
+            command "nc"
+            args "-l" "-p 1302"
+         }
+
+         pane { 
+            name "Primary"
+            command "blightmud"
+         }
+      }
+   }
+}
+
