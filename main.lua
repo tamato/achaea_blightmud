@@ -12,6 +12,19 @@ reloadid = alias.add('^reload$', function() script.reset() end)
 
 blight.bind('ctrl-w', function() blight.ui('delete_word_left') end)
 
+rootdir = '/home/tamausb/repos/Blightmud/.run/data/plugins/achaea_blightmud'
+
+alias.add('^loadcthul', function()
+    -- connect
+    store.session_write('cur_host', 'achaea.com')
+    store.session_write('cur_port', '23')
+
+    -- name
+    -- pw
+    -- load up scripts
+    script.load(rootdir..'occult/battlerage.lua')
+end)
+
 gmcp.on_ready(function ()
     blight.output("Registering GMCP")
     gmcp.register("Room")
