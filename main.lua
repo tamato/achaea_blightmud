@@ -16,8 +16,9 @@ rootdir = '/home/tamausb/repos/Blightmud/.run/data/plugins/achaea_blightmud'
 
 alias.add('^loadcthul', function()
     -- connect
-    store.session_write('cur_host', 'achaea.com')
-    store.session_write('cur_port', '23')
+    -- mud.connect('achaea.com', '23')
+    mud.on_connect(function(host, port)
+    end)
 
     -- name
     -- pw
