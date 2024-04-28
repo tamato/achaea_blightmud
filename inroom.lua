@@ -1,6 +1,4 @@
 require "utilities"
--- test
-local M = {}
 
 players = {}
 local showPlayers = true
@@ -12,54 +10,60 @@ local showSeen = true
 -- Open up the connections, using netcat `nc -lkp 1300`
 local conn = socket.connect("localhost", 1300)
 
-function M.onAddPlayer(obj)
-    if not players[obj.name] then
-        players[obj.name] = {color = '', id=#players+1}
-        players[#players+1] = obj.name
+local onAddPlayer = function()
+    if not players[Room.AddPlayer.name] then
+        players[Room.AddPlayer.name] = {color = '', id=#players+1}
+        players[#players+1] = Room.AddPlayer.name
     end
 
-    if seen[obj.name] == nil then
-        seen[obj.name] = {color = '', id=#seen+1}
-        seen[#seen+1] = obj.name
+    if seen[Room.AddPlayer.name] == nil then
+        seen[Room.AddPlayer.name] = {color = '', id=#seen+1}
+        seen[#seen+1] = Room.AddPlayer.name
     end
     displayRoom()
 end
+registerEvent('playersAdd', 'gmcp.Room.AddPlayer', onPlayers)
 
-function M.onPlayers(obj)
-    for _,v in ipairs(obj)
+local onPlayers = function()
+    players = {}
+
+    for _,v in ipairs(Room.Players)
     do
-        if players[v.name] == nil then
-            players[v.name] = {color = '', id=#players+1}
-            players[#players+1] = v.name
-        end
+        if string.find(v.name, whoami) == nil then
+            if players[v.name] == nil then
+                players[v.name] = {color = '', id=#players+1}
+                players[#players+1] = v.name
+            end
 
-        if seen[v.name] == nil then
-            seen[v.name] = {color = '', id=#seen+1}
-            seen[#seen+1] = v.name
+            if seen[v.name] == nil then
+                seen[v.name] = {color = '', id=#seen+1}
+                seen[#seen+1] = v.name
+            end
         end
     end
 
     displayRoom()
 end
+registerEvent('playersList', 'gmcp.Room.Players', onPlayers)
 
-function M.onRmPlayer(obj)
-    blight.output('onRmPlayer: ' .. obj.removeplayer)
-
-    local id = players[obj.removeplayer].id
+local onRmPlayer = function ()
+    local id = players[Room.RemovePlayer.removeplayer].id
     players[id] = nil
-    players[obj.removeplayer] = nil
+    players[Room.RemovePlayer.removeplayer] = nil
 
     displayRoom()
 end
+registerEvent('playersRemove', 'gmcp.Room.RemovePlayer', onPlayers)
 
+-- Tests ----
 alias.add('add ?(.+)', function(matches)
     local p = {name=matches[2]}
-    M.onAddPlayer(p)
+    onAddPlayer(p)
 end)
 
 alias.add('rm ?(.+)', function(matches)
     local p = {removeplayer = matches[2]}
-    M.onRmPlayer(p)
+    onRmPlayer(p)
 end)
 
 local function displayContainer(conn, tbl, title, show)
@@ -98,5 +102,3 @@ alias.add('^tseen$', function()
     displayRoom()
 end)
 
-
-return M

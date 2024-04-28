@@ -1,15 +1,20 @@
+// $ zellij action new-tab --layout /path/to/layout_file.kdl
+
 layout {
    pane split_direction="vertical" {
       
       pane split_direction="horizontal" {
          size "20%" 
-         
+
          pane {
+            size "50%" 
+            name "InRoom"
             command "nc"
             args "-l" "-p 1300"
          }
-
+         
          pane {
+            name "Score"
             command "nc"
             args "-l" "-p 1301"
          }
@@ -18,11 +23,11 @@ layout {
       pane split_direction="horizontal" {
          size "80%"
          pane {
-            size "30%"
+            size "20%"
 
             name "Comms"
-            command "nc"
-            args "-l" "-p 1302"
+            command "tail"
+            args "-f" "/home/ahrimen/repos/Blightmud/.run/config/commsmsgs.txt"
          }
 
          pane { 

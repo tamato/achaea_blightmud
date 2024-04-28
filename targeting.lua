@@ -1,6 +1,5 @@
 -- Targetting scripts
 
-
 -- need to load the table from file.
 targetList = json.decode(store.disk_read('targetList'))
 targetingArea = 'starter'
