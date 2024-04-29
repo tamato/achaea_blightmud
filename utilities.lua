@@ -69,13 +69,13 @@ function registerEvent(name, event, func)
     Events[event][name] = func
 end
 
-
 ------------------------------------
         -- Color Printing --
 ------------------------------------
 function cecho(msg)
+    -- 'msg' is expected to hold color values
     local text = cformat(msg..'<reset>')
-    blight.output(text)
+    blight.output(text..C_RESET)
 end
 
 ------------------------------------
@@ -93,4 +93,13 @@ end)
 alias.add('^re (.+)$', function(matches)
     deregisterEvent(matches[2], 'testing')
 end)
+
+
+function highlight(matches, color)
+    local orig = matches[1]
+    local re = regex.new('^(?P<e>\\x1b.+m)(?P<s>.+)'..matches[2])
+    local str = re:replace(orig, cformat('$e$s<'..color..'>'..matches[2]..'<reset>$e'))
+    -- Shold this be line?
+    blight.output(str..C_RESET)
+end
 

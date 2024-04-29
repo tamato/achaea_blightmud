@@ -53,6 +53,13 @@ gmcp.on_ready(function ()
     gmcp.register("Char.Afflictions")
     gmcp.register("Comm.Channel")
     gmcp.register("Core.Ping")
+    gmcp.send("Char.Ping")
+
+    gmcp.receive("Core.Ping", function (data)
+        Core.Ping = Core.Ping or {}
+        gmcp.send("Char.Ping")
+        print("Ping: " .. data)
+    end)
 
     gmcp.receive("Room.Info", function (data)
         Room.Info = json.decode(data)
@@ -133,8 +140,13 @@ InsFree = 'queue insert freestanding 1'
 GetGold = 1
 alias.add('^tgold$', function() GetGold = not GetGold end)
 
-trigger.add('^.+(gold(en)? sovereigns).*$', {gag=true}, function(matches)
-   cecho('<black:yellow>'..matches[1])
+alias.add('^mytest$', function() 
+    mud.output(C_RED..'get all golden sovereigns from'..C_RESET)
+    mud.output(C_GREEN..'get all gold sovereigns from'..C_RESET)
+end)
+
+trigger.add('^.+(gold(en)? sovereigns).*$', {gag=true, raw=true}, function(matches)
+    highlight(matches, 'black:yellow')
 end)
 
 trigger.add('^You have slain.+.$', {gag=true}, function(matches)
@@ -142,8 +154,17 @@ trigger.add('^You have slain.+.$', {gag=true}, function(matches)
 end)
 
 -- TODO
+    -- caputre colors of people coming and going. Don't need to because thats in gmcp.
+    -- handle multiple people in one line (death messages have multiple peeps mentioned)
     -- Shield
     -- Tattoos
     -- starburst
     -- fellow citizen
-    -- highlight gold
+
+
+alias.add('^highlight (.+) (.+)$', function(matches)
+    trigger.add(matches[2], {gag=true, raw=true}, function(hm)
+        highlight(hm, matches[3])
+    end)
+end)
+
