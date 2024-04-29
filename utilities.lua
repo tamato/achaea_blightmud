@@ -24,11 +24,17 @@ function displayTable(tbl)
 end
 
 function sendLine(conn, msg)
-    conn:send(msg..'\n')
+    local text = cformat('<reset>'..msg..'<reset>')
+    conn:send(text..'\n')
 end
 
 Events = {}
 Events['gmcp.Char.Vitals'] = {}
+
+Events['gmcp.Char.Items.List'] = {}
+Events['gmcp.Char.Items.Add'] = {}
+Events['gmcp.Char.Items.Remove'] = {}
+
 Events['gmcp.Room.AddPlayer'] = {}
 Events['gmcp.Room.Player'] = {}
 Events['gmcp.Room.RemovePlayer'] = {}

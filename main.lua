@@ -1,6 +1,6 @@
 require 'utilities'
-require 'targeting'
 require 'inroom'
+require 'targeting'
 
 local handle = io.popen('cat ~/.config/blight/settings')
 local result = handle:read("*a")
@@ -49,6 +49,8 @@ gmcp.on_ready(function ()
     blight.output("Registering GMCP")
     gmcp.register("Room")
     gmcp.register("Char")
+    gmcp.register("Char.Items")
+    gmcp.register("Char.Afflictions")
     gmcp.register("Comm.Channel")
     gmcp.register("Core.Ping")
 
@@ -64,7 +66,7 @@ gmcp.on_ready(function ()
     end)
     gmcp.receive("Char.Status", function (data)
         Char.Status = json.decode(data)
-        charStatus = json.decode(data)
+        raiseEvent('gmcp.Char.Status')
     end)
 
     -- afflictions related
@@ -113,12 +115,15 @@ gmcp.on_ready(function ()
     -- Items
     gmcp.receive("Char.Items.List", function (data)
         Char.Items.List = json.decode(data)
+        raiseEvent('gmcp.Char.Items.List')
     end)
     gmcp.receive("Char.Items.Add", function (data)
         Char.Items.Add = json.decode(data)
+        raiseEvent('gmcp.Char.Items.Add')
     end)
     gmcp.receive("Char.Items.Remove", function (data)
         Char.Items.Remove = json.decode(data)
+        raiseEvent('gmcp.Char.Items.Remove')
     end)
 end)
 
