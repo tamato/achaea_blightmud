@@ -69,6 +69,15 @@ function registerEvent(name, event, func)
     Events[event][name] = func
 end
 
+
+------------------------------------
+        -- Color Printing --
+------------------------------------
+function cecho(msg)
+    local text = cformat(msg..'<reset>')
+    blight.output(text)
+end
+
 ------------------------------------
         -- TESTS --
 ------------------------------------

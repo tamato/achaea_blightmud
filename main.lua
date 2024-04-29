@@ -56,8 +56,7 @@ gmcp.on_ready(function ()
 
     gmcp.receive("Room.Info", function (data)
         Room.Info = json.decode(data)
-        -- blight.output('GMCP roomInfo: '.. data)
-        -- blight.output('Area Name: ' .. Room.Info.area)
+        raiseEvent('gmcp.Room.Info')
     end)
 
     gmcp.receive("Char.Vitals", function (data)
@@ -102,7 +101,6 @@ gmcp.on_ready(function ()
         local file = io.open(blight.config_dir()..'/commsmsgs.txt', 'a')
         io.output(file)
 
-        print(data)
         local time = ''
         local s,e = string.find(obj.channel, 'tell')
         if s == 1 then
@@ -127,3 +125,25 @@ gmcp.on_ready(function ()
     end)
 end)
 
+
+--[[ General Stuff ]]--
+
+AddFree = 'queue add freestanding'
+InsFree = 'queue insert freestanding 1'
+GetGold = 1
+alias.add('^tgold$', function() GetGold = not GetGold end)
+
+trigger.add('^.+(gold(en)? sovereigns).*$', {gag=true}, function(matches)
+   cecho('<black:yellow>'..matches[1])
+end)
+
+trigger.add('^You have slain.+.$', {gag=true}, function(matches)
+   cecho('<black:magenta>'..matches[1])
+end)
+
+-- TODO
+    -- Shield
+    -- Tattoos
+    -- starburst
+    -- fellow citizen
+    -- highlight gold
