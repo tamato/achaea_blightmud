@@ -102,18 +102,13 @@ gmcp.on_ready(function ()
 
     -- comms
     gmcp.receive("Comm.Channel.Text", function (data)
-
         local obj = json.decode(data)
-        local file = io.open(blight.config_dir()..'/commsmsgs.txt', 'a')
-        io.output(file)
-
         local time = ''
-        local s,e = string.find(obj.channel, 'tell')
+        local s = string.find(obj.channel, 'tell')
         if s == 1 then
             time = cformat('<white>'..os.date('%m/%d %X '))
         end
-        io.write(time..obj.text..'\n')
-        io.close()
+        toFile('commsmsgs.txt', time..obj.text)
     end)
 
     -- Items
@@ -143,11 +138,6 @@ alias.add('^tgold$', function()
     cecho('Auto get gold is: '..tostring(GetGold))
 end)
 
-alias.add('^mytest$', function() 
-    mud.output(C_RED..'get all golden sovereigns from'..C_RESET)
-    mud.output(C_GREEN..'get all gold sovereigns from'..C_RESET)
-end)
-
 goldTrigger = goldTrigger or trigger.add('^.+(gold(en)? sovereigns).*$', {gag=true, raw=true}, function(matches)
     highlight(matches, 'black:yellow')
 end)
@@ -158,8 +148,6 @@ slainTrigger = slainTrigger or trigger.add('^You have slain.+.$', {gag=true}, fu
 end)
 
 -- TODO
-    -- handle multiple people in one line (death messages have multiple peeps mentioned)
-    -- Shield
     -- Tattoos
 
 alias.add('^highlight (.+) (.+)$', function(matches)
@@ -168,13 +156,16 @@ alias.add('^highlight (.+) (.+)$', function(matches)
     end)
 end)
 
-#highlight {^Your fellow citizen, %w, has just escaped imprisonment in the foul pygmy dungeon. Welcome him to %w!} {light cyan};
-citizenTrigger = citizenTrigger or trigger.add('^Your fellow citizen, (.+).+', function(matches)
+citizenTrigger = citizenTrigger or trigger.add('^Your fellow citizen, (\\w+).+', {gag=true,raw=true},
+function(matches)
     highlight(matches, '<magenta>')
+    local msg = cformat('<white>!!<reset> New citizen, <yellow>'..matches[2]..'<reset> has joined <white>!!')
+    cecho(msg)
+    toFile('commsmsgs.txt', msg)
 end)
 
 Generosity = 0
-alias.add('^self$', function()
+alias.add('^defs$', function()
     Generosity = not Generosity
 
     if Generosity then
@@ -185,14 +176,44 @@ alias.add('^self$', function()
     end
 end)
 
--- #action {^A beam of prismatic light suddenly shoots into the room.$} {
---    #highlight {%*} { black b red };
---    #send {*gmcp[room][info][exits][+1]};
--- };
+prismaticTrigger = prismaticTrigger or trigger.add(
+'^A beam of prismatic light suddenly shoots into the room.$',
+{gag=true,raw=true},
+function (matches)
+    local msg = '<white>{{{ <black:red>Someone is prisming YOU<reset><white> }}}'
+    cecho(msg)
+    cecho(matches[1])
+    toFile('commsmsgs.txt', msg)
+    toFile('commsmsgs.txt', matches[1])
+end)
 
--- #action {^Your starburst tattoo flares as the world is momentarily tinted red.$} {
---    #show <118>------------------------------------------------;
---    #line oneshot #sub {%*} {           <138>STARBURST USED};
---    #show <118>------------------------------------------------;
--- };
+starBurstTrigger = starBurstTrigger or trigger.add(
+'^Your starburst tattoo flares as the world is momentarily tinted red.$',
+{gag=true,raw=true},
+function (matches)
+    local dashes = '<black:red>--------------------------------------------------------------------'
+    local msg = dashes..'\n'
+    msg = msg..matches[1]..'\n'
+    msg = msg..dashes
+
+    cecho(msg)
+    toFile('commsmsgs.txt', msg)
+end)
+
+targetShieldedTrigger = targetShieldedTrigger or trigger.add(
+'^A nearly invisible magical shield forms around.+$',
+{gag=true,raw=true},
+function (matches)
+    -- underline, fg red, bg black
+    cecho('\x1b[4;31;40m'..matches[1])
+end)
+
+-- #action {^A %w tattoo fades from view and disappears} {
+--    print Lost %1 tattoo!;
+-- }
+
+alias.add('^mytest$', function() 
+    mud.output('A nearly invisible magical shield forms around some monster')
+end)
+
 
