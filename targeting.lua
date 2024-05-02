@@ -59,18 +59,18 @@ function atk(target)
         for id,mob in pairs(RoomMobs) do
             for tar,_ in pairs(targetList[targetingArea]) do
                 if mob.name:find(tar) ~= nil then
-                    bashTarget = id
+                    BashTarget = id
                     goto done
                 end
             end
         end
     else
-        bashTarget = target
+        BashTarget = target
     end
     ::done::
 
-    if bashTarget ~= nil then
-        mud.send(BashAtkCmd..' '..bashTarget)
+    if BashTarget ~= nil then
+        mud.send(BashAtkCmd..' '..BashTarget)
         slainTrigger.enabled = true
         qAtkTrigger.enabled = true
     end
@@ -79,7 +79,7 @@ targetingAliases:add('^atk ?(.+)?$', function(matches) atk(matches[2]) end)
 function stopAutoBash()
     if slainTrigger then slainTrigger.enabled = false end
     qAtkTrigger.enabled = false
-    bashTarget = nil
+    BashTarget = nil
     cecho(C_Info..'Stopped AutoBashing')
 end
 targetingAliases:add('^satk$', stopAutoBash)

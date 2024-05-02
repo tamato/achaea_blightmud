@@ -6,68 +6,42 @@ local temper = temper or true
 local ruin = ruin or true
 local ruinCost = ruinCost or 17
 
-ruinShield = ruinShield or true
-
-function enableFluc()
-  fluc = true
-end
-function enableStagnate()
-  stagnate = true
-end
-function enableChaosgate()
-  chaosgate = true
-end
-function enableHarry()
-  harry = true
-end
-function enableTemper()
-  temper = true
+function enableRage(rage)
+    rage = true
 end
 
 local battleRage = function()
   local rage = Char.Vitals.charstats[2]
-  amount = rex.match(rage, [[\d+]])
+  local amount = rex.match(rage, [[\d+]])
   amount = tonumber(amount)
   --botter:print("rage: " .. amount)
   
-  occultistBR(amount)
-end
+  if Target then
 
-function occultistBR(amount)
-
-  if bashTarget then
+  if BashTarget then
     -- destory the shield
-    
-    -- get some help
-    if amount &gt; 32 and temper and table:length(room_targets) &gt; 1 then
-      setAltTarget()
-      if alt_target then
-        send("TEMPER " .. alt_target)
-        temper = false
-        tempTimer(43, [[enableTemper()]])
-        botter:log("Tempering enemy " .. alt_target)
-        alt_target = 0
-        tempTimer(5.0, function() updateConsoles() end)
-      end
+    if ruinShield and amount &gt; ruinCost then
+      send("ruin") 
+      ruinShield = false
       return
     end
     
-    if amount &gt; (36+ruinCost) and chaosgate then 
-      send("chaosgate " .. bashTarget) 
+    if amount >= (36+ruinCost) and chaosgate then 
+      mud.send("chaosgate " .. target) 
       chaosgate = false
-      tempTimer(23, [[enableChaosgate()]])
-    elseif amount &gt; (24+ruinCost) and stagnate then 
+      timer.add(23, 1, enableRage(chaosgate))
+    elseif amount >= (24+ruinCost) and stagnate then 
       stagnate = false
-      send("stagnate " .. bashTarget) 
-      tempTimer(35, [[enableStagnate()]])   
-    elseif amount &gt; (14+ruinCost) and harry then
+      mud.send("stagnate " .. target) 
+      timer.add(35, 1, enableRage(stagnate))
+    elseif amount >= (14+ruinCost) and harry then
       harry = false
-      send("harry " .. bashTarget)
-      tempTimer(17, [[enableHarry()]])
-    elseif amount &gt; (23+ruinCost) and fluc then 
-     send("fluctuate " .. bashTarget)
-     fluc = false
-     tempTimer(25, [[enableFluc()]])
+      mud.send("harry " .. target)
+      timer.add(17, 1, enableRage(harry))
+    elseif amount >= (23+ruinCost) and fluc then 
+      send("fluctuate " .. target)
+      fluc = false
+      timer.add(25, 1, enableRage(fluc))
     end
   end
 end

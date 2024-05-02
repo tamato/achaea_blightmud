@@ -154,7 +154,7 @@ end)
 
 slainTrigger = slainTrigger or trigger.add('^You have slain.+.$', {gag=true}, function(matches)
     cecho('<black:magenta>'..matches[1])
-    bashTarget = nil
+    BashTarget = nil
 end)
 
 -- TODO
