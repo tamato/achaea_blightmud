@@ -7,10 +7,6 @@ local result = handle:read("*a")
 handle:close()
 local settings = assert(load(result))()
 
-alias.add('^reload$', function() 
-    script.reset() 
-end) 
-
 blight.bind('ctrl-w', function() blight.ui('delete_word_left') end)
 
 alias.add('^loadcthul$', function()
@@ -19,8 +15,10 @@ alias.add('^loadcthul$', function()
         mud.send(settings.pw)
         blight.status_height(1)
         blight.status_line(0, "")
-        whoami = 'Cthul'
-
+        Whoami = 'Cthul'
+        BashAtkCmd = 'warp'
+        Balance = 'equilibrium'
+        script.load(settings.rootdir..'occult/misc.lua')
         script.load(settings.rootdir..'occult/battlerage.lua')
     end)
     mud.connect('achaea.com', '23')
@@ -32,8 +30,10 @@ alias.add('^loadmel$', function()
         mud.send(settings.pw)
         blight.status_height(1)
         blight.status_line(0, "")
-        whoami = 'Melkervur'
-
+        Whoami = 'Melkervur'
+        BashAtkCmd = 'slash'
+        Balance = 'balance'
+        script.load(settings.rootdir..'unname/misc.lua')
         script.load(settings.rootdir..'unname/battlerage.lua')
     end)
     mud.connect('achaea.com', '23')
@@ -53,7 +53,6 @@ gmcp.on_ready(function ()
     gmcp.register("Char.Afflictions")
     gmcp.register("Comm.Channel")
     gmcp.register("Core.Ping")
-    gmcp.send("Char.Ping")
 
     gmcp.receive("Core.Ping", function (data)
         Core.Ping = Core.Ping or {}
@@ -138,33 +137,62 @@ end)
 AddFree = 'queue add freestanding'
 InsFree = 'queue insert freestanding 1'
 GetGold = 1
-alias.add('^tgold$', function() GetGold = not GetGold end)
+AutoBash = 1
+alias.add('^tgold$', function() 
+    GetGold = not GetGold 
+    cecho('Auto get gold is: '..tostring(GetGold))
+end)
 
 alias.add('^mytest$', function() 
     mud.output(C_RED..'get all golden sovereigns from'..C_RESET)
     mud.output(C_GREEN..'get all gold sovereigns from'..C_RESET)
 end)
 
-trigger.add('^.+(gold(en)? sovereigns).*$', {gag=true, raw=true}, function(matches)
+goldTrigger = goldTrigger or trigger.add('^.+(gold(en)? sovereigns).*$', {gag=true, raw=true}, function(matches)
     highlight(matches, 'black:yellow')
 end)
 
-trigger.add('^You have slain.+.$', {gag=true}, function(matches)
-   cecho('<black:magenta>'..matches[1])
+slainTrigger = slainTrigger or trigger.add('^You have slain.+.$', {gag=true}, function(matches)
+    cecho('<black:magenta>'..matches[1])
+    bashTarget = nil
 end)
 
 -- TODO
-    -- caputre colors of people coming and going. Don't need to because thats in gmcp.
     -- handle multiple people in one line (death messages have multiple peeps mentioned)
     -- Shield
     -- Tattoos
-    -- starburst
-    -- fellow citizen
-
 
 alias.add('^highlight (.+) (.+)$', function(matches)
     trigger.add(matches[2], {gag=true, raw=true}, function(hm)
         highlight(hm, matches[3])
     end)
 end)
+
+#highlight {^Your fellow citizen, %w, has just escaped imprisonment in the foul pygmy dungeon. Welcome him to %w!} {light cyan};
+citizenTrigger = citizenTrigger or trigger.add('^Your fellow citizen, (.+).+', function(matches)
+    highlight(matches, '<magenta>')
+end)
+
+Generosity = 0
+alias.add('^self$', function()
+    Generosity = not Generosity
+
+    if Generosity then
+        mud.send('curing defences on')
+    else
+        mud.send('curing defences off')
+        mud.send('generosity')
+    end
+end)
+
+-- #action {^A beam of prismatic light suddenly shoots into the room.$} {
+--    #highlight {%*} { black b red };
+--    #send {*gmcp[room][info][exits][+1]};
+-- };
+
+-- #action {^Your starburst tattoo flares as the world is momentarily tinted red.$} {
+--    #show <118>------------------------------------------------;
+--    #line oneshot #sub {%*} {           <138>STARBURST USED};
+--    #show <118>------------------------------------------------;
+-- };
 

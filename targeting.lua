@@ -3,31 +3,37 @@
 -- need to load the table from file.
 targetList = json.decode(store.disk_read('targetList'))
 targetingArea = 'starter'
+-- targetList = {}
+-- targetList[targetingArea] = {}
+-- targetList[targetingArea]['spider'] = true
+-- targetList[targetingArea]['orc'] = true
 
-if targetsId ~= nil then alias.remove(targetsId) end
-targetsId = alias.add("^targets ?(.+)?$", function(matches)
+-- Group Alias for targeting
+targetingAliases = targetingAliases or alias.add_group()
+targetingAliases:clear()
+targetingAliases:add("^targets ?(.+)?$", function(matches)
+    
+    -- make sure the area exits first.
+    if targetList[targetingArea] == nil then
+        targetList[targetingArea] = {}
+    end
 
     if matches[2] == '' then
-        blight.output('** Targets for area ['..targetingArea..'] **')
-        blight.output('----------------------------------')
-        for _,v in ipairs(targetList[targetingArea]) do
-            blight.output('\t'..v)
+        cecho(C_Info..'** Targets for area [ '..targetingArea..' ] **')
+        cecho(C_GREEN..'----------------------------------')
+        for k,v in pairs(targetList[targetingArea]) do
+            cecho(C_WHITE..'  '..k)
         end
     else
         local tar = matches[2]
-        
-        if targetList[targetingArea] == nil then
-            targetList[targetingArea] = {}
-        end
-
-        local idx = inTable(targetList[targetingArea],tar)
-        if idx ~= -1 then
+        if targetList[targetingArea][tar] then
             blight.output('Target <'..tar..'> removed')
-            targetList[targetingArea][idx] = nil
+            targetList[targetingArea][tar] = nil
         else
             blight.output('Target <'..tar..'> added')
-            table.insert(targetList[targetingArea], tar)
+            targetList[targetingArea][tar] = true
         end
+
         -- save the table
         store.disk_write('targetList', json.encode(targetList))
     end
@@ -35,13 +41,47 @@ targetsId = alias.add("^targets ?(.+)?$", function(matches)
 end)
 
 --[[ Set Area for targeting ]]--
-local getTargets = function()
+local setTargetArea = function()
     targetingArea = Room.Info.area
 end
-registerEvent('itemsList', 'gmcp.Room.Info', getTargets)
+registerEvent('itemsList', 'gmcp.Room.Info', setTargetArea)
 
 --[[ Atk something in the room that is on the list ]]--
-alias.add('^atk$', function()
+-- target is a str, because it is passed through an alias.
+function atk(target)
+    stopAutoBash()
+    if target == '' then
+        -- check if there is anyone to attack
+        -- leave, if not.
+        if len(RoomMobs) == 0 then blight.output('Nothing to attack') return end
 
-end)
+        -- If there is, get a target.
+        for id,mob in pairs(RoomMobs) do
+            for tar,_ in pairs(targetList[targetingArea]) do
+                if mob.name:find(tar) ~= nil then
+                    bashTarget = id
+                    goto done
+                end
+            end
+        end
+    else
+        bashTarget = target
+    end
+    ::done::
+
+    if bashTarget ~= nil then
+        mud.send(BashAtkCmd..' '..bashTarget)
+        slainTrigger.enabled = true
+        qAtkTrigger.enabled = true
+    end
+end
+targetingAliases:add('^atk ?(.+)?$', function(matches) atk(matches[2]) end)
+function stopAutoBash()
+    if slainTrigger then slainTrigger.enabled = false end
+    qAtkTrigger.enabled = false
+    bashTarget = nil
+    cecho(C_Info..'Stopped AutoBashing')
+end
+targetingAliases:add('^satk$', stopAutoBash)
+
 

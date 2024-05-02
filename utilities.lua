@@ -1,5 +1,55 @@
 -- Common use items
 
+C_Info = C_GREEN
+C_Dbg = BG_YELLOW..C_GREEN
+C_Error = BG_YELLOW..C_RED
+C_Alert = "\x1b[74;31m"
+--[[
+colors
+-------
+0 black
+1 red
+2 green
+3 yellow
+4 blue
+5 magenta
+6 cyan
+7 white
+
+
+foreground/back 3/4
+
+behaviours
+0 - default
+1 - bold
+2 - low intesity
+3 - italic
+4 - underline
+5 - blink
+6 - blink (fast)
+7 - reverse
+
+--]]
+
+function scriptReload(script)
+    -- check that we passed in a valid script
+    if package.loaded[script]
+    then
+        package.loaded[script] = nil
+        require(script)
+    else
+        cecho(C_Alert..'Script '..script..' is not loaded.')
+    end
+end
+alias.add('^rel (.+)$', function(matches) 
+    if matches[2] ~= ''
+    then 
+        scriptReload(matches[2]) 
+    else
+        cecho(C_Alert..'Need to pass a script name') 
+    end
+end)
+
 function inTable(tbl, name)
     local idx = 0
     for i,v in ipairs(tbl) do
@@ -11,14 +61,26 @@ function inTable(tbl, name)
     return idx
 end
 
+function len(tbl)
+    local len = 0
+    for k,_ in pairs(tbl) do len = len + 1 end
+    return len
+end
+
 function displayTable(tbl)
-    print('Table entries...')
+    cecho(C_Info..'Table entries...')
     for key,value in pairs(tbl) do
-        if type(value) ~= "table" then
-            print('Key: ' .. key..' value: '..value)
-        else
-            print('Recursive table')
-            displayTable(value)
+        if type(value) == "boolean" then
+            print('Key: ' .. key..' bool value: '..tostring(value))
+        elseif type(value) == "number" then
+            print('Key: ' .. key..' number value: '..tostring(value))
+        elseif type(value) == "string" then
+            print('Key: ' .. key..' string value: '..value)
+        elseif type(value) == "integer" then
+            print('Key: ' .. key..' int value: '..tostring(value))
+        -- elseif type(value) == "table" then
+        --     print('Recursive table '..key)
+        --     displayTable(value)
         end
     end
 end
@@ -75,7 +137,7 @@ end
 function cecho(msg)
     -- 'msg' is expected to hold color values
     local text = cformat(msg..'<reset>')
-    blight.output(text..C_RESET)
+    blight.output(text)
 end
 
 ------------------------------------

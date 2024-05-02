@@ -8,8 +8,7 @@ local showItems = true
 seen = {}
 roomPlayers = {}
 roomItems = {}
-roomMobs = {}
-roomTargets = {}
+RoomMobs = {}
 
 -- Open up the connections, using netcat `nc -lkp 1300`
 local conn = socket.connect("localhost", 1300)
@@ -19,13 +18,13 @@ local conn = socket.connect("localhost", 1300)
 -------------------------------------------------------------------------
 local onAddPlayer = function()
     if not roomPlayers[Room.AddPlayer.name] then
-        roomPlayers[Room.AddPlayer.name] = {color = '', id=#roomPlayers+1}
         roomPlayers[#roomPlayers+1] = Room.AddPlayer.name
+        roomPlayers[Room.AddPlayer.name] = {color = '', id=#roomPlayers+1}
     end
 
     if seen[Room.AddPlayer.name] == nil then
-        seen[Room.AddPlayer.name] = {color = '', id=#seen+1}
         seen[#seen+1] = Room.AddPlayer.name
+        seen[Room.AddPlayer.name] = {color = '', id=#seen+1}
     end
     displayRoom()
 end
@@ -36,7 +35,7 @@ local onPlayers = function()
 
     for _,v in ipairs(Room.Players)
     do
-        if string.find(v.name, whoami) == nil then
+        if string.find(v.name, Whoami) == nil then
             if roomPlayers[v.name] == nil then
                 roomPlayers[v.name] = {color = '', id=#roomPlayers+1}
                 roomPlayers[#roomPlayers+1] = v.name
@@ -66,7 +65,7 @@ registerEvent('playersRemove', 'gmcp.Room.RemovePlayer', onPlayers)
         --[[        Items/Monsters In the Room         ]]--
 -------------------------------------------------------------------------
 local onItemList = function ()
-    roomMobs = {}
+    RoomMobs = {}
     roomItems = {}
     local rm_list = Char.Items.List
     if rm_list.location == "room" then
@@ -94,8 +93,7 @@ local onItemRm = function ()
     local id = Char.Items.Remove.item.id
 
     roomItems[id] = nil
-    roomMobs[id] = nil
-    roomTargets[id] = nil
+    RoomMobs[id] = nil
 
     displayRoom()
 end
@@ -114,13 +112,13 @@ function collectObjects(item)
            string.find(item.attrib, 'm') == 1  -- is a monster
         then 
             -- monsters
-            roomMobs[id] = {name=item.name, color='<white>'}
+            RoomMobs[id] = {name=item.name, color='<white>'}
         -- check for gold
         elseif string.find(item.attrib, 't') == 1 
         then
             roomItems[id] = {name=item.name, color='<white>'}
 
-            if string.find(item.name, 'gold') ~= nil
+            if string.find(item.name, 'gold') ~= nil and GetGold
             then
                 mud.send('get gold')
                 mud.send('put gold in pack')
@@ -130,12 +128,12 @@ function collectObjects(item)
 end
 
 -- Tests ----
-alias.add('add ?(.+)', function(matches)
+alias.add('^add ?(.+)?$', function(matches)
     local p = {name=matches[2]}
     onAddPlayer(p)
 end)
 
-alias.add('rm ?(.+)', function(matches)
+alias.add('^rm ?(.+)?$', function(matches)
     local p = {removeplayer = matches[2]}
     onRmPlayer(p)
 end)
@@ -174,7 +172,7 @@ function displayRoom()
         sendLine(conn, "\x1b[2J\x1b[1;1H")
 
         displayItemsMobs(conn, roomItems, 'Items', showItems)
-        displayItemsMobs(conn, roomMobs, 'Denizens', showMobs)
+        displayItemsMobs(conn, RoomMobs, 'Denizens', showMobs)
         displayContainer(conn, roomPlayers, 'Adventurers', showPlayers)
         displayContainer(conn, seen, 'Seen', showSeen)
     end

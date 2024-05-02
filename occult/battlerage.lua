@@ -35,13 +35,8 @@ end
 
 function occultistBR(amount)
 
-  if target then
+  if bashTarget then
     -- destory the shield
-    if ruinShield and amount &gt; ruinCost then
-      send("ruin") 
-      ruinShield = false
-      return
-    end
     
     -- get some help
     if amount &gt; 32 and temper and table:length(room_targets) &gt; 1 then
@@ -58,19 +53,19 @@ function occultistBR(amount)
     end
     
     if amount &gt; (36+ruinCost) and chaosgate then 
-      send("chaosgate " .. target) 
+      send("chaosgate " .. bashTarget) 
       chaosgate = false
       tempTimer(23, [[enableChaosgate()]])
     elseif amount &gt; (24+ruinCost) and stagnate then 
       stagnate = false
-      send("stagnate " .. target) 
+      send("stagnate " .. bashTarget) 
       tempTimer(35, [[enableStagnate()]])   
     elseif amount &gt; (14+ruinCost) and harry then
       harry = false
-      send("harry " .. target)
+      send("harry " .. bashTarget)
       tempTimer(17, [[enableHarry()]])
     elseif amount &gt; (23+ruinCost) and fluc then 
-     send("fluctuate " .. target)
+     send("fluctuate " .. bashTarget)
      fluc = false
      tempTimer(25, [[enableFluc()]])
     end
