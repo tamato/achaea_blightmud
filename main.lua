@@ -215,7 +215,6 @@ alias.add('^qq$', function()
     mud.send('QQ')
 end)
 
-
 trainerTrigger = trainerTrigger or trigger.add(
     '^\\w+ has requested that you share some of your knowledge',
     {},

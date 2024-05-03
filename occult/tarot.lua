@@ -1,7 +1,7 @@
 --:: Tarot Alias's ::--
 cecho('<red>Loaded tarot')
 
-alias.add('^b ?(.+)?^', function(matches)
+alias.add('^b ?(.+)?$', function(matches)
     if matches[2] == '' then mud.send('hermits') 
     else
         for _,item in ipairs(Char.Items.List.items) do
@@ -15,20 +15,48 @@ alias.add('^b ?(.+)?^', function(matches)
         mud.send(AddFree..'activate hermit '..matches[2])
     end
 end)
+alias.add('^t ?(.+)?$', function(matches)
+    if matches[2] == '' then mud.send('hermits') 
+    else
+        mud.send(AddFree..'fling hermit at ground'..matches[2])
+    end
+end)
+
+alias.add('^uni ?(.+)?$', function()
+    if matches[2] == '' then
+        cecho(C_Underline..C_Info..'Universe Shortcuts')
+        cecho(C_Info..'nt: New Thera')
+        cecho(C_Info..'gn: Genji')
+        cecho(C_Info..'sh: Shastaan')
+        cecho(C_Info..'az: Azdun')
+        cecho(C_Info..'bf: Bitterfork')
+        cecho(C_Info..'mb: Manara')
+    else
+
+        local dest = nil
+        if      matches[2]:find('nt') then dest = 'newthera'
+        elseif  matches[2]:find('gn') then dest = 'genji'
+        elseif  matches[2]:find('sh') then dest = 'shastaan'
+        elseif  matches[2]:find('az') then dest = 'azdun'
+        elseif  matches[2]:find('bf') then dest = 'bitterfork'
+        elseif  matches[2]:find('mb') then dest = 'manara'
+        else    cecho(C_Err..'Need to provide a valid option!')
+        end
+
+        if dest then
+            mud.send(AddFree..'fling universe at ground')
+            trigger.add('^A shimmering, translucent', 
+                 {count=1},
+                 function()
+                     local go = dest
+                     mud.send(AddFree..'touch '..go)
+                 end
+            )
+        end
+    end
+end)
 
 --[[
-
-#alias {t} { 
-   #if {"%1" === ""}  { 
-      #send {hermits} 
-   };
-   #else {
-      #send {$addfree fling hermit at ground %1};
-
-      #line oneshot #action {^You have recovered balance on all limbs.$} {b %1};
-      updateCharUI;
-   };
-};
 
 #alias {death} {
    #if {"%1" == ""} {err Pass in a target for Death;#return};
@@ -64,19 +92,6 @@ end)
    #nop #delay {22} {#send {$addfree pinchaura speed}};
 }
 
-#class priestess kill;
-#class priestess open;
-
-#nop when fling is used.;
-#nop You shuffle a tarot card inscribed with the High Priestess out of your deck, bringing the total number of remaining cards to 89;
-
-#nop when outd is used;
-#nop You shuffle a card with the image of the High Priestess out of your deck, bringing the total remaining to 86;
-#line oneshot #action {High Priestess %* bringing the total %2 to %3.$} {
-   #var priCards %3; 
-   updateCharUI; 
-};
-
 #line oneshot #action {Raising the High Priestess tarot over your head} {
    #var priestessEnable 1; 
    #var priStatus {Ready};
@@ -90,9 +105,6 @@ end)
    #class priestess clear
 };
 
-#class priestess close
-#class priestess save
-
 #var priStatus {Ready};
 #var priCards 0;
 #alias {pri} {
@@ -104,41 +116,6 @@ end)
    #var priStatus {Qd};
    #var priestessEnable 0; 
    updateCharUI;
-};
-
-#nop Alias only match at the start of a line.;
-#nop There is also a comment about if no % var's are used in the commands, something will get appended to %0.;
-#alias {uni} {
-   #if {"%1" === ""} {
-      print {Universe Shortcuts};
-      #show {nt : New Thera};
-      #show {gn : Genji};
-      #show {sh: Shastaan};
-      #show {az: Azdun};
-      #show {bf: Bitterfork};
-      #show {mb: Manara};
-      #show {};
-   } {
-      #send {$addfree fling universe at ground};
-      
-      #var dest %1;
-      
-      #if     {"%1" === "nt"} {#var dest {newthera}};
-      #elseif {"%1" === "gn"} {#var dest {genji}};
-      #elseif {"%1" === "sh"} {#var dest {shastaan}};
-      #elseif {"%1" === "az"} {#var dest {azdun}};
-      #elseif {"%1" === "bf"} {#var dest {bitterfork}};
-      #elseif {"%1" === "mb"} {#var dest {manara}};
-      
-      #nop example of a one time action;
-      #line oneshot {#action {A shimmering, translucent }
-      {
-         #show {Headed out to $dest};
-
-         #send {$addfree touch $dest};
-         #unvar dest;
-      }};
-   }
 };
 
 #nop Fool, 35 sec cooldown;
@@ -181,20 +158,6 @@ end)
    };
 
    #unvar cardcount;
-};
-
-#alias {dl} {
-   #line oneshot #action {{.+}[%%!s%%1] Priestess} {
-      #var priCards %%1;
-      updateCharUI;
-   };
-
-   #line oneshot #action {{.+}[%%!s%%1] Hermit} {
-      #var hermitCards %%1;
-      updateCharUI;
-   };
-
-   #send {dl};
 };
 
 --]]

@@ -1,4 +1,13 @@
 -- Common use items
+------------------------------------
+        -- Color Printing --
+------------------------------------
+function cecho(msg)
+    -- 'msg' is expected to hold color values
+    local text = cformat(msg..'<reset>')
+    blight.output(text)
+end
+
 cecho('<red>Loaded utilities')
 
 C_Info = C_GREEN
@@ -141,15 +150,6 @@ function registerEvent(name, event, func)
 
     print('Added event '..name..' '..event)
     Events[event][name] = func
-end
-
-------------------------------------
-        -- Color Printing --
-------------------------------------
-function cecho(msg)
-    -- 'msg' is expected to hold color values
-    local text = cformat(msg..'<reset>')
-    blight.output(text)
 end
 
 ------------------------------------
