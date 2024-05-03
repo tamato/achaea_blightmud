@@ -3,8 +3,22 @@
 C_Info = C_GREEN
 C_Dbg = BG_YELLOW..C_GREEN
 C_Error = BG_YELLOW..C_RED
-C_Alert = "\x1b[74;31m"
+C_Alert = "\x1b[7;4;31m"
+C_Underline = "\x1b[4m"
 --[[
+
+Example
+    \x1b[1;4;31;42m
+    \x1b[ - start of the escape code
+    numbers seperate by ';' - codes
+        single digit codes are behaviours
+        dobule digit are colors
+        3x - forground colors
+        4x - background
+    m - ends the sequence
+    The result of this sequence is
+        bold, underlined, red text with green bg.
+
 colors
 -------
 0 black
@@ -15,9 +29,6 @@ colors
 5 magenta
 6 cyan
 7 white
-
-
-foreground/back 3/4
 
 behaviours
 0 - default

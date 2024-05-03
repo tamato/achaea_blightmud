@@ -129,8 +129,8 @@ end)
 
 --[[ General Stuff ]]--
 
-AddFree = 'queue add freestanding'
-InsFree = 'queue insert freestanding 1'
+AddFree = 'queue add freestanding '
+InsFree = 'queue insert freestanding 1 '
 GetGold = 1
 AutoBash = 1
 alias.add('^tgold$', function() 
@@ -147,9 +147,6 @@ slainTrigger = slainTrigger or trigger.add('^You have slain.+.$', {gag=true}, fu
     BashTarget = nil
 end)
 
--- TODO
-    -- Tattoos
-
 alias.add('^highlight (.+) (.+)$', function(matches)
     trigger.add(matches[2], {gag=true, raw=true}, function(hm)
         highlight(hm, matches[3])
@@ -162,18 +159,6 @@ function(matches)
     local msg = cformat('<white>!!<reset> New citizen, <yellow>'..matches[2]..'<reset> has joined <white>!!')
     cecho(msg)
     toFile('commsmsgs.txt', msg)
-end)
-
-Generosity = 0
-alias.add('^defs$', function()
-    Generosity = not Generosity
-
-    if Generosity then
-        mud.send('curing defences on')
-    else
-        mud.send('curing defences off')
-        mud.send('generosity')
-    end
 end)
 
 prismaticTrigger = prismaticTrigger or trigger.add(
@@ -208,12 +193,42 @@ function (matches)
     cecho('\x1b[4;31;40m'..matches[1])
 end)
 
--- #action {^A %w tattoo fades from view and disappears} {
---    print Lost %1 tattoo!;
--- }
+tattooTrigger = tattooTrigger or trigger.add(
+'^A (\\w+) tattoo fades from view and disappears.*$',
+{raw=true},
+function (matches)
+    local msg = cformat('Lost <green>'..matches[2]..'<reset> tattoo')
+    cecho(msg)
+    toFile('commsmsgs.txt', msg..'\n')
+end)
+
+alias.add('^qq$', function() 
+    trainerTrigger.enabled = false
+    mud.send('curing defences off')
+    mud.send('CITY GUIDE UNAVAILABLE')
+    mud.send('QQ')
+end)
+
+
+trainerTrigger = trainerTrigger or trigger.add(
+    '^\\w+ has requested that you share some of your knowledge',
+    {},
+    function()
+        mud.send('OK')
+    end
+)
+trainerTrigger.enabled = false
+
+alias.add('^trainer$', function() 
+    mud.send('CITY GUIDE AVAILABLE')
+    mud.send('CITY NOVICE LIST')
+    trainerTrigger.enabled = true
+end)
+}
+--]]
 
 alias.add('^mytest$', function() 
-    mud.output('A nearly invisible magical shield forms around some monster')
+    mud.output('A moon tattoo fades from view and disappears.')
 end)
 
 
