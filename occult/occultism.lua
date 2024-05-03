@@ -1,4 +1,5 @@
 --:: Occultists Alias's ::--
+cecho('<red>Loaded occultism')
 
 -- Occultist Colors
 PowerActivated = '\x1b[4;1;35;46m'
@@ -74,4 +75,5 @@ heartTrigger = heartTrigger or trigger.add(
 
 
 --]]
+cecho('<red>Finished Loaded occultism')
 

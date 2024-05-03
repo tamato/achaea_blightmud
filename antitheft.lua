@@ -1,3 +1,5 @@
+cecho('<red>Started AntiTheft')
+
 Generosity = 0
 alias.add('^defs$', function()
     Generosity = not Generosity
@@ -29,3 +31,4 @@ end)
    }
 }
 --]]
+cecho('<red>Finished AntiTheft')

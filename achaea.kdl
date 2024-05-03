@@ -22,17 +22,15 @@ layout {
 
       pane split_direction="horizontal" {
          size "80%"
+         pane { 
+            name "Primary"
+         }
          pane {
             size "20%"
 
             name "Comms"
             command "tail"
             args "-f" "/home/ahrimen/repos/Blightmud/.run/config/commsmsgs.txt"
-         }
-
-         pane { 
-            name "Primary"
-            command "blightmud"
          }
       }
    }

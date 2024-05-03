@@ -1,4 +1,5 @@
 -- Targetting scripts
+cecho('<red>Started Targeting')
 
 -- need to load the table from file.
 targetList = json.decode(store.disk_read('targetList'))
@@ -85,3 +86,4 @@ end
 targetingAliases:add('^satk$', stopAutoBash)
 
 
+cecho('<red>Finished Targeting')

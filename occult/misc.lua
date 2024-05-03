@@ -1,3 +1,4 @@
+cecho('<red>Loaded Occultism/Misc')
 
 -- Used in conjuntion with 'You have slain..' and the function 'atk'
 qAtkTrigger = qAtkTrigger or trigger.add('^You have recovered '..Balance..'.*', {gag=true}, function(matches)
@@ -6,4 +7,5 @@ qAtkTrigger = qAtkTrigger or trigger.add('^You have recovered '..Balance..'.*', 
     atk()
 end)
 
+cecho('<red>Finished Loaded Occultism/Misc')
 

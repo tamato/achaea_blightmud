@@ -1,3 +1,4 @@
+cecho('<red>Started inroom')
 require "utilities"
 
 local showPlayers = true
@@ -198,4 +199,6 @@ alias.add('^tseen$', function()
     showSeen = not showSeen
     displayRoom()
 end)
+
+cecho('<red>Finished inroom')
 

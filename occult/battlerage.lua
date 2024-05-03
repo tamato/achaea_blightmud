@@ -1,3 +1,4 @@
+cecho('<red>Loaded Occultism/BattleRage')
 local stagnate = stagnate or true
 local chaosgate = chaosgate or true
 local harry = harry or true
@@ -12,19 +13,18 @@ end
 
 local battleRage = function()
   local rage = Char.Vitals.charstats[2]
-  local amount = rex.match(rage, [[\d+]])
-  amount = tonumber(amount)
-  --botter:print("rage: " .. amount)
+  local re = regex.new('(\\d+)')
+  local matches = re:match(rage)
+  local amount = tonumber(matches[2])
+  cecho("<red:white>rage: " .. amount)
   
-  if Target then
-
   if BashTarget then
     -- destory the shield
-    if ruinShield and amount &gt; ruinCost then
-      send("ruin") 
-      ruinShield = false
-      return
-    end
+    -- if ruinShield and amount &gt; ruinCost then
+    --   send("ruin")
+    --   ruinShield = false
+    --   return
+    -- end
     
     if amount >= (36+ruinCost) and chaosgate then 
       mud.send("chaosgate " .. target) 
@@ -48,3 +48,4 @@ end
 
 registerEvent('occultbattlerage', 'gmcp.Char.Vitals', battleRage)
 
+cecho('<red>Finished Loaded Occultism/BattleRage')

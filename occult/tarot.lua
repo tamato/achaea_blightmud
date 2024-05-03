@@ -1,4 +1,5 @@
 --:: Tarot Alias's ::--
+cecho('<red>Loaded tarot')
 
 alias.add('^b ?(.+)?^', function(matches)
     if matches[2] == '' then mud.send('hermits') 
@@ -197,4 +198,5 @@ end)
 };
 
 --]]
+cecho('<red>Finished Loaded tarot')
 

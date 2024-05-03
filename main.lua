@@ -1,6 +1,9 @@
 require 'utilities'
 require 'inroom'
 require 'targeting'
+require 'antitheft'
+
+cecho('<red>Started Main')
 
 local handle = io.popen('cat ~/.config/blight/settings')
 local result = handle:read("*a")
@@ -19,6 +22,9 @@ alias.add('^loadcthul$', function()
         BashAtkCmd = 'warp'
         Balance = 'equilibrium'
         script.load(settings.rootdir..'occult/misc.lua')
+        script.load(settings.rootdir..'occult/occultism.lua')
+        script.load(settings.rootdir..'occult/tarot.lua')
+        -- script.load(settings.rootdir..'occult/domination.lua')
         script.load(settings.rootdir..'occult/battlerage.lua')
     end)
     mud.connect('achaea.com', '23')
@@ -224,11 +230,10 @@ alias.add('^trainer$', function()
     mud.send('CITY NOVICE LIST')
     trainerTrigger.enabled = true
 end)
-}
---]]
 
 alias.add('^mytest$', function() 
     mud.output('A moon tattoo fades from view and disappears.')
 end)
 
+cecho('<red>Finished Main')
 

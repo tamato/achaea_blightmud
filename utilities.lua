@@ -1,4 +1,5 @@
 -- Common use items
+cecho('<red>Loaded utilities')
 
 C_Info = C_GREEN
 C_Dbg = BG_YELLOW..C_GREEN
@@ -178,10 +179,11 @@ end
 
 
 function toFile(file, msg)
-    local file = io.open(blight.config_dir()..file, 'a')
+    local file = io.open(blight.config_dir()..'/'..file, 'a')
     io.output(file)
     io.write(msg..'\n')
     io.close()
 end
 
+cecho('<red>Finished Loaded utilities')
 
