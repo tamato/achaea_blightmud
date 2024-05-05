@@ -63,7 +63,7 @@ alias.add('^uni ?(.+)?$', function(matches)
 end)
 
 PriestessReady = 1
-alias.add('^pri ?(.+)?', function(matches)
+alias.add('^tpri ?(.+)?', function(matches)
     if PriestessReady == 0 then return end
 
     local target = 'me'

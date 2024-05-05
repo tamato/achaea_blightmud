@@ -10,24 +10,23 @@ layout {
             size "50%" 
             name "InRoom"
             command "nc"
-            args "-l" "-p 1300"
+            args "-l" "-k" "-p 1300"
          }
          
          pane {
             name "Score"
             command "nc"
-            args "-l" "-p 1301"
+            args "-l" "-k" "-p 1301"
          }
       }
 
       pane split_direction="horizontal" {
          size "80%"
-         pane { 
+         pane focus=true {
             name "Primary"
          }
          pane {
             size "20%"
-
             name "Comms"
             command "tail"
             args "-f" "/home/ahrimen/repos/Blightmud/.run/config/commsmsgs.txt"

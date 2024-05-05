@@ -2,12 +2,8 @@
 cecho('<blue>Started Targeting')
 
 -- need to load the table from file.
-targetList = json.decode(store.disk_read('targetList'))
+targetList = json.decode(store.disk_read('targetList')) or {}
 targetingArea = 'starter'
--- targetList = {}
--- targetList[targetingArea] = {}
--- targetList[targetingArea]['spider'] = true
--- targetList[targetingArea]['orc'] = true
 
 -- Group Alias for targeting
 targetingAliases = targetingAliases or alias.add_group()

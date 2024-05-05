@@ -10,13 +10,14 @@ local result = handle:read("*a")
 handle:close()
 local settings = assert(load(result))()
 
+blight.status_height(5)
+        blight.status_line(0, "")
+
 blight.bind('ctrl-w', function() blight.ui('delete_word_left') end)
 alias.add('^loadcthul$', function()
     mud.on_connect(function(host, port)
         mud.send('cthul')
         mud.send(settings.pw)
-        blight.status_height(1)
-        blight.status_line(0, "")
         Whoami = 'Cthul'
         BashAtkCmd = 'warp'
         Balance = 'equilibrium'
@@ -34,8 +35,6 @@ alias.add('^loadmel$', function()
     mud.on_connect(function(host, port)
         mud.send('melkervur')
         mud.send(settings.pw)
-        blight.status_height(1)
-        blight.status_line(0, "")
         Whoami = 'Melkervur'
         BashAtkCmd = 'slash'
         Balance = 'balance'
@@ -70,6 +69,15 @@ gmcp.on_ready(function ()
     gmcp.receive("Room.Info", function (data)
         Room.Info = json.decode(data)
         raiseEvent('gmcp.Room.Info')
+
+        local exits = ''
+        for k,_ in pairs(Room.Info.exits) do
+            if exits == '' then exits = k
+            else exits = exits..', '..k
+            end
+        end
+
+        blight.status_line(0, exits)
     end)
 
     gmcp.receive("Char.Vitals", function (data)
@@ -240,5 +248,18 @@ promptTrigger = promptTrigger or trigger.add('.*', {prompt=1,raw=1}, function(ma
     blight.output(matches[1])
 end)
 
+WorldMap = WorldMap or nil
+function loadMap()
+    local file = io.open(settings.mapdir..'/map.json', 'r')
+    local jsonString = file:read "*a"
+    file:close()
+
+    WorldMap = json.decode(jsonString)
+    io.close()
+end
+alias.add('^loadmap$', loadMap)
+
+
 cecho('<blue>Finished Main')
+
 
