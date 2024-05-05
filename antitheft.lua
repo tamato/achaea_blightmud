@@ -1,15 +1,17 @@
-cecho('<red>Started AntiTheft')
+cecho('<blue>Started AntiTheft')
 
-Generosity = 0
+Generosity = true
 alias.add('^defs$', function()
     Generosity = not Generosity
 
     if Generosity then
-        mud.send('curing defences on')
-    else
         mud.send('curing defences off')
         mud.send('generosity')
+    else
+        mud.send('curing defences on')
     end
+
+    raiseEvent('checking.defences')
 end)
 
 --[[
@@ -31,4 +33,4 @@ end)
    }
 }
 --]]
-cecho('<red>Finished AntiTheft')
+cecho('<blue>Finished AntiTheft')

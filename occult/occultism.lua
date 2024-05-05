@@ -1,11 +1,11 @@
 --:: Occultists Alias's ::--
-cecho('<red>Loaded occultism')
+cecho('<blue>Loaded occultism')
 
 -- Occultist Colors
 PowerActivated = '\x1b[4;1;35;46m'
 PowerRemoved = '\x1b[2;45;36m'
 
-AstralActive = AstralActive or 0
+AstralActive = AstralActive or false
 astralTrigger = astralTrigger or trigger.add(
     '^You summon all your will to focus your aura. In a flash of blazing light, your aura consumes your body and nothing is left except your disembodied presence.$', 
     {gag=true},
@@ -30,9 +30,11 @@ alias.add('^chaos$', function()
     cecho(C_Dbg..'Highlight when the gate is ready')
 end)
 
-DistortActive = DistortActive or 0
+DistortActive = DistortActive or false
 alias.add('^da$', function()
+    cecho(C_Info..'DA '..tostring(DistortActive))
     DistortActive = not DistortActive
+    cecho(C_Info..'after DA '..tostring(DistortActive))
     if DistortActive then
         mud.send(AddFree..'distortaura')
     else
@@ -75,5 +77,5 @@ heartTrigger = heartTrigger or trigger.add(
 
 
 --]]
-cecho('<red>Finished Loaded occultism')
+cecho('<blue>Finished Loaded occultism')
 

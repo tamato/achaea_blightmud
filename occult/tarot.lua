@@ -1,11 +1,16 @@
 --:: Tarot Alias's ::--
-cecho('<red>Loaded tarot')
+cecho('<blue>Loaded tarot')
 
-alias.add('^b ?(.+)?$', function(matches)
+alias.add('^hb ?(.+)?$', function(matches)
+    if Char.Items.List.items == nil then 
+        cecho(C_Alert..'YOURE BLIND YOU FOOL')
+        return
+    end
+
     if matches[2] == '' then mud.send('hermits') 
     else
         for _,item in ipairs(Char.Items.List.items) do
-            if item:find('monolith') then
+            if item.name:find('monolith') then
                 cecho(C_Alert..'Monolith Present, find somewhere else')
                 return
             end
@@ -15,22 +20,23 @@ alias.add('^b ?(.+)?$', function(matches)
         mud.send(AddFree..'activate hermit '..matches[2])
     end
 end)
-alias.add('^t ?(.+)?$', function(matches)
+alias.add('^ht ?(.+)?$', function(matches)
     if matches[2] == '' then mud.send('hermits') 
     else
-        mud.send(AddFree..'fling hermit at ground'..matches[2])
+        mud.send(AddFree..'fling hermit at ground '..matches[2])
+        cecho(C_Alert..'Bind used card')
     end
 end)
 
-alias.add('^uni ?(.+)?$', function()
+alias.add('^uni ?(.+)?$', function(matches)
     if matches[2] == '' then
-        cecho(C_Underline..C_Info..'Universe Shortcuts')
-        cecho(C_Info..'nt: New Thera')
-        cecho(C_Info..'gn: Genji')
-        cecho(C_Info..'sh: Shastaan')
-        cecho(C_Info..'az: Azdun')
-        cecho(C_Info..'bf: Bitterfork')
-        cecho(C_Info..'mb: Manara')
+        cecho(C_Underline..C_Info..'  Universe Shortcuts  ')
+        cecho(C_Info..'  - nt: New Thera')
+        cecho(C_Info..'  - gn: Genji')
+        cecho(C_Info..'  - sh: Shastaan')
+        cecho(C_Info..'  - az: Azdun')
+        cecho(C_Info..'  - bf: Bitterfork')
+        cecho(C_Info..'  - mb: Manara')
     else
 
         local dest = nil
@@ -54,6 +60,66 @@ alias.add('^uni ?(.+)?$', function()
             )
         end
     end
+end)
+
+PriestessReady = 1
+alias.add('^pri ?(.+)?', function(matches)
+    if PriestessReady == 0 then return end
+
+    local target = 'me'
+    if matches[2] ~= '' then
+        target = matches[2]
+    end
+
+    mud.send(InsFree..'fling priestess at '..target)
+    PriestessReady = 0
+    
+    trigger.add('^Raising the High Priestess tarot over your head.*$', 
+        {count=1},
+        function()
+            PriestessReady = 1
+        end)
+end)
+
+alias.add('^inscr (.+) ?(.+)?$', function(matches)
+    local cardCount = 20
+    if matches[3] ~= '' then 
+        cardCount = matches[3]
+    end
+
+    mud.send('outd '..cardCount..' blank')
+    mud.send('inscribe blank with '..cardCount..' '..matches[2])
+    trigger.add('^You have successfully inscribed the image of the \\w+ on your Tarot card$',
+        {count=1},
+        function()
+            local card = matches[2]
+            mud.send('ind all '..card)
+        end)
+end)
+
+FoolReady = 1
+FoolTimer = 35
+FoolTimeRemaining = 0
+alias.add('^fool ?(.+)?$', function(matches)
+
+    trigger.add('^You may heal another affliction$', {gag=1,count=1}, function(matches) 
+        FoolReady = 1 
+        cecho(C_Reverse..matches[1])
+    end) 
+
+    FoolTimeRemaining = 35
+    timer.add(1.0, 34, function() 
+        FoolTimeRemaining = FoolTimeRemaining - 1
+        if FoolTimeRemaining < 1 then cecho(C_Alert..'Fool is ready again!') end
+    end)
+
+    local target = 'me'
+    if matches[2] ~= '' then
+        target = matches[2]
+    end
+    -- Should this be an insert (force to the first pos in queue)?
+    mud.send(AddFree..'fling fool at '..target)
+
 end)
 
 --[[
@@ -91,75 +157,6 @@ end)
 
    #nop #delay {22} {#send {$addfree pinchaura speed}};
 }
-
-#line oneshot #action {Raising the High Priestess tarot over your head} {
-   #var priestessEnable 1; 
-   #var priStatus {Ready};
-
-   #nop Have it out of deck, it could be similar to the rift in that some things my block getting it out.;
-   #nop TODO Should do this for FOOL too.;
-   #nop #send {outd priestess};
-   updateCharUI;
-   print Healed from Priestess;
-
-   #class priestess clear
-};
-
-#var priStatus {Ready};
-#var priCards 0;
-#alias {pri} {
-   #nop Since this actin is nested in the Alias we HAVE to use an extra %;
-   #class priestess load;
-
-   #nop #send {$insfree fling priestess at me};
-   #send {$insfree fling priestess at me};
-   #var priStatus {Qd};
-   #var priestessEnable 0; 
-   updateCharUI;
-};
-
-#nop Fool, 35 sec cooldown;
-
-#var foolMaxTimer 35;
-#var remainingFoolTime 0;
-#alias {fool} {
-   #send {$addfree fling fool at me};
-
-   #line oneshot #action {^You press the Fool tarot to your forehead.$}{
-      #line oneshot #high {%*} {reverse};
-      #var remainingFoolTime $foolMaxTimer;
-
-      #ticker foolTimer {
-         #math remainingFoolTime {$remainingFoolTime - 1};
-         updateCharUI;
-
-         #if {remainingFoolTime <= 0} {#unticker foolTimer; #var remainingFoolTime 0;};
-      } {1};
-
-      updateCharUI;
-   };
-
-   #line oneshot #high {^You may heal another affliction$}{reverse};
-};
-
-#alias {inscr} {
-   #var cardcount 0;
-   #if {&{2} == 0} { #var cardcount 20};
-   #else {#var cardcount %1};
-   
-   #var card %1;
-   #send {outd $cardcount blank};
-   #send {inscribe blank with $cardcount $card};
-
-   #line oneshot #action {You have successfully inscribed the image of the %%1 on your Tarot card} {
-      #line oneshot #high {%%*} {reverse};
-      #send {ind all $card};
-      #unvar card;
-   };
-
-   #unvar cardcount;
-};
-
 --]]
-cecho('<red>Finished Loaded tarot')
+cecho('<blue>Finished Loaded tarot')
 

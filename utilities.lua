@@ -8,13 +8,14 @@ function cecho(msg)
     blight.output(text)
 end
 
-cecho('<red>Loaded utilities')
+cecho('<blue>Loaded utilities')
 
 C_Info = C_GREEN
 C_Dbg = BG_YELLOW..C_GREEN
 C_Error = BG_YELLOW..C_RED
-C_Alert = "\x1b[7;4;31m"
+C_Alert = "\x1b[4;31;47m"
 C_Underline = "\x1b[4m"
+C_Reverse = "\x1b[7m"
 --[[
 
 Example
@@ -88,6 +89,14 @@ function len(tbl)
     return len
 end
 
+function tableFind(tbl, target)
+    for key,value in pairs(tbl) do
+        if key:find(target) then
+            print('Found value '..value)
+        end
+    end
+end
+
 function displayTable(tbl)
     cecho(C_Info..'Table entries...')
     for key,value in pairs(tbl) do
@@ -99,9 +108,11 @@ function displayTable(tbl)
             print('Key: ' .. key..' string value: '..value)
         elseif type(value) == "integer" then
             print('Key: ' .. key..' int value: '..tostring(value))
-        -- elseif type(value) == "table" then
-        --     print('Recursive table '..key)
-        --     displayTable(value)
+        elseif type(value) == "table" then
+            if type(value) == "string" then
+                print('Recursive table '..key)
+                displayTable(value)
+            end
         end
     end
 end
@@ -112,29 +123,21 @@ function sendLine(conn, msg)
 end
 
 Events = {}
-Events['gmcp.Char.Vitals'] = {}
-
-Events['gmcp.Char.Items.List'] = {}
-Events['gmcp.Char.Items.Add'] = {}
-Events['gmcp.Char.Items.Remove'] = {}
-
-Events['gmcp.Room.AddPlayer'] = {}
-Events['gmcp.Room.Player'] = {}
-Events['gmcp.Room.RemovePlayer'] = {}
-
 function raiseEvent(event)
-    if Events[event] ~= nil then
-        for key,func in pairs(Events[event]) 
-        do
-            func()
-        end
+    -- if it doesn't exist yet, make it.
+    if Events[event] == nil then
+        Events[event] = {}
+    end
+
+    for key,func in pairs(Events[event]) 
+    do
+        func()
     end
 end
 
 function deregisterEvent(name, event)
     if Events[event] ~= nil then
         if Events[event][name] ~= nil then
-            print('Removed event '..name..' '..event)
             Events[event][name] = nil
         end
     end
@@ -147,8 +150,6 @@ function registerEvent(name, event, func)
             Events[event][name] = {}
         end
     end
-
-    print('Added event '..name..' '..event)
     Events[event][name] = func
 end
 
@@ -185,5 +186,5 @@ function toFile(file, msg)
     io.close()
 end
 
-cecho('<red>Finished Loaded utilities')
+cecho('<blue>Finished Loaded utilities')
 

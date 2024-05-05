@@ -1,4 +1,4 @@
-cecho('<red>Started inroom')
+cecho('<blue>Started inroom')
 require "utilities"
 
 local showPlayers = true
@@ -17,7 +17,7 @@ local conn = socket.connect("localhost", 1300)
 -------------------------------------------------------------------------
         --[[        Players In the Room         ]]--
 -------------------------------------------------------------------------
-local onAddPlayer = function()
+registerEvent('playersAdd', 'gmcp.Room.AddPlayer', function()
     if not roomPlayers[Room.AddPlayer.name] then
         roomPlayers[#roomPlayers+1] = Room.AddPlayer.name
         roomPlayers[Room.AddPlayer.name] = {color = '', id=#roomPlayers+1}
@@ -28,10 +28,9 @@ local onAddPlayer = function()
         seen[Room.AddPlayer.name] = {color = '', id=#seen+1}
     end
     displayRoom()
-end
-registerEvent('playersAdd', 'gmcp.Room.AddPlayer', onPlayers)
+end)
 
-local onPlayers = function()
+registerEvent('playersList', 'gmcp.Room.Players', function()
     roomPlayers = {}
 
     for _,v in ipairs(Room.Players)
@@ -50,17 +49,15 @@ local onPlayers = function()
     end
 
     displayRoom()
-end
-registerEvent('playersList', 'gmcp.Room.Players', onPlayers)
+end)
 
-local onRmPlayer = function ()
+registerEvent('playersRemove', 'gmcp.Room.RemovePlayer', function()
     local id = roomPlayers[Room.RemovePlayer.removeplayer].id
     roomPlayers[id] = nil
     roomPlayers[Room.RemovePlayer.removeplayer] = nil
 
     displayRoom()
-end
-registerEvent('playersRemove', 'gmcp.Room.RemovePlayer', onPlayers)
+end)
 
 -------------------------------------------------------------------------
         --[[        Items/Monsters In the Room         ]]--
@@ -200,5 +197,5 @@ alias.add('^tseen$', function()
     displayRoom()
 end)
 
-cecho('<red>Finished inroom')
+cecho('<blue>Finished inroom')
 

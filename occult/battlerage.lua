@@ -1,51 +1,70 @@
-cecho('<red>Loaded Occultism/BattleRage')
+cecho('<blue>Loaded Occultism/BattleRage')
 local stagnate = stagnate or true
 local chaosgate = chaosgate or true
 local harry = harry or true
 local fluc = fluc or true
 local temper = temper or true
-local ruin = ruin or true
 local ruinCost = ruinCost or 17
 
-function enableRage(rage)
-    rage = true
+function enableChaosGate()
+    chaosgate = true
 end
 
-local battleRage = function()
+function enableStagnate()
+    stagnate = true
+end
+
+function enableHarry()
+    harry = true
+end
+
+function enableFluc()
+    fluc = true
+end
+
+registerEvent('occultbattlerage', 'gmcp.Char.Vitals', function()
   local rage = Char.Vitals.charstats[2]
   local re = regex.new('(\\d+)')
   local matches = re:match(rage)
   local amount = tonumber(matches[2])
-  cecho("<red:white>rage: " .. amount)
   
   if BashTarget then
-    -- destory the shield
-    -- if ruinShield and amount &gt; ruinCost then
-    --   send("ruin")
-    --   ruinShield = false
-    --   return
-    -- end
-    
     if amount >= (36+ruinCost) and chaosgate then 
-      mud.send("chaosgate " .. target) 
+      mud.send("chaosgate " .. BashTarget) 
       chaosgate = false
-      timer.add(23, 1, enableRage(chaosgate))
+      timer.add(23, 1, enableChaosGate)
     elseif amount >= (24+ruinCost) and stagnate then 
       stagnate = false
-      mud.send("stagnate " .. target) 
-      timer.add(35, 1, enableRage(stagnate))
+      mud.send("stagnate " .. BashTarget) 
+      timer.add(35, 1, enableStagnate)
     elseif amount >= (14+ruinCost) and harry then
       harry = false
-      mud.send("harry " .. target)
-      timer.add(17, 1, enableRage(harry))
+      mud.send("harry " .. BashTarget)
+      timer.add(17, 1, enableHarry)
     elseif amount >= (23+ruinCost) and fluc then 
-      send("fluctuate " .. target)
+      mud.send("fluctuate " .. BashTarget)
       fluc = false
-      timer.add(25, 1, enableRage(fluc))
+      timer.add(25, 1, enableFluc)
     end
   end
-end
+end)
 
-registerEvent('occultbattlerage', 'gmcp.Char.Vitals', battleRage)
+brTrigger = brTrigger or trigger.add(
+'^A nearly invisible magical shield forms around.+$',
+{},
+function (matches)
+    if BashTarget then
+        local rage = Char.Vitals.charstats[2]
+        local re = regex.new('(\\d+)')
+        local matches = re:match(rage)
+        local amount = tonumber(matches[2])
 
-cecho('<red>Finished Loaded Occultism/BattleRage')
+        -- destory the shield
+        if amount >= ruinCost then
+            mud.send("ruin")
+            return
+        end
+    end
+end)
+
+cecho('<blue>Finished Loaded Occultism/BattleRage')

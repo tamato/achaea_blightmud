@@ -3,7 +3,7 @@ require 'inroom'
 require 'targeting'
 require 'antitheft'
 
-cecho('<red>Started Main')
+cecho('<blue>Started Main')
 
 local handle = io.popen('cat ~/.config/blight/settings')
 local result = handle:read("*a")
@@ -137,8 +137,8 @@ end)
 
 AddFree = 'queue add freestanding '
 InsFree = 'queue insert freestanding 1 '
-GetGold = 1
-AutoBash = 1
+GetGold = true
+AutoBash = true
 alias.add('^tgold$', function() 
     GetGold = not GetGold 
     cecho('Auto get gold is: '..tostring(GetGold))
@@ -234,5 +234,10 @@ alias.add('^mytest$', function()
     mud.output('A moon tattoo fades from view and disappears.')
 end)
 
-cecho('<red>Finished Main')
+-- force prompt to be displayed
+promptTrigger = promptTrigger or trigger.add('.*', {prompt=1,raw=1}, function(matches)
+    blight.output(matches[1])
+end)
+
+cecho('<blue>Finished Main')
 

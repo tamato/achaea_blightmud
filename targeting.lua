@@ -1,5 +1,5 @@
 -- Targetting scripts
-cecho('<red>Started Targeting')
+cecho('<blue>Started Targeting')
 
 -- need to load the table from file.
 targetList = json.decode(store.disk_read('targetList'))
@@ -51,7 +51,7 @@ registerEvent('itemsList', 'gmcp.Room.Info', setTargetArea)
 -- target is a str, because it is passed through an alias.
 function atk(target)
     stopAutoBash()
-    if target == '' then
+    if target == '' or target == nil then
         -- check if there is anyone to attack
         -- leave, if not.
         if len(RoomMobs) == 0 then blight.output('Nothing to attack') return end
@@ -86,4 +86,4 @@ end
 targetingAliases:add('^satk$', stopAutoBash)
 
 
-cecho('<red>Finished Targeting')
+cecho('<blue>Finished Targeting')
