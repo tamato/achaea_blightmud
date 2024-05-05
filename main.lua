@@ -11,7 +11,6 @@ handle:close()
 local settings = assert(load(result))()
 
 blight.bind('ctrl-w', function() blight.ui('delete_word_left') end)
-
 alias.add('^loadcthul$', function()
     mud.on_connect(function(host, port)
         mud.send('cthul')
@@ -28,6 +27,7 @@ alias.add('^loadcthul$', function()
         script.load(settings.rootdir..'occult/battlerage.lua')
     end)
     mud.connect('achaea.com', '23')
+    connectInRoom()
 end)
 
 alias.add('^loadmel$', function()
@@ -43,6 +43,7 @@ alias.add('^loadmel$', function()
         script.load(settings.rootdir..'unname/battlerage.lua')
     end)
     mud.connect('achaea.com', '23')
+    connectInRoom()
 end)
 
 Char = {}

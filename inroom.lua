@@ -12,7 +12,16 @@ roomItems = {}
 RoomMobs = {}
 
 -- Open up the connections, using netcat `nc -lkp 1300`
-local conn = socket.connect("localhost", 1300)
+local conn = nil
+function connectInRoom()
+    conn = socket.connect("localhost", 1300)
+    if conn then
+        -- Clear the screen and reset cursor to top right
+        sendLine(conn, "Connected")
+    end
+end
+
+alias.add('^connectInRoom$',connectInRoom)
 
 -------------------------------------------------------------------------
         --[[        Players In the Room         ]]--
