@@ -257,6 +257,7 @@ function loadMap()
     WorldMap = json.decode(jsonString)
     io.close()
 end
+loadMap()
 alias.add('^loadmap$', loadMap)
 
 

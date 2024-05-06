@@ -181,7 +181,6 @@ end
 
 function toFile(file, msg)
     local file = io.open(blight.config_dir()..'/'..file, 'a')
-
     io.output(file)
     io.write(msg..'\n')
     io.close()
